@@ -1,10 +1,11 @@
 #!/usr/bin/env python3.8
 import logging
+import pyopenpose
 
 from fastapi import FastAPI
 from uvicorn import run
 
-from app.routes import items, status
+from app.routes import pose, status
 
 log = logging.getLogger(__name__)
 
@@ -12,8 +13,7 @@ log = logging.getLogger(__name__)
 def create_api() -> FastAPI:
     fast_api = FastAPI()
     fast_api.include_router(status.router, prefix="/status", tags=["status"])
-    # TODO: Replace placeholder with something useful :)
-    fast_api.include_router(items.router, prefix="/items", tags=["placeholder"])
+    fast_api.include_router(pose.router, prefix="/pose", tags=["pose"])
     return fast_api
 
 
