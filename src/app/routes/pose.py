@@ -1,37 +1,36 @@
-
 from pydantic import AnyUrl
-from fastapi import APIRouter
-from app.schemas.pose import *
+import io
+from fastapi import APIRouter, Depends
+from starlette.responses import StreamingResponse
+from app.cv.openpose import OpenPoseEngine, get_openpose_engine
+
+from app.cv.fun import infer_url, draw_url
+from typing import List
+from app.schemas.pose import Pose
 
 
 router = APIRouter()
 
 
-@router.post("/", response_model=Pose)
-def extract_pose_from_url(*, url: AnyUrl):
+@router.post("/", response_model=List[Pose])
+def extract_pose_from_url(*, url: AnyUrl, engine: OpenPoseEngine = Depends(get_openpose_engine)):
     """
-    Create new item.
+    \f
+    :param url:
+    :param engine:
+    :return:
     """
-    return Pose(
-        keypoints=[
-            Keypoint(
-                name=KeypointEnum.left_elbow,
-                ix={
-                    ModelEnum.openpose: 6,
-                    ModelEnum.posenet: 2,
-                },
-                x=0.211,
-                y=0.132,
-            ),
-            Keypoint(
-                name=KeypointEnum.right_ear,
-                ix={
-                    ModelEnum.openpose: 17,
-                    ModelEnum.posenet: 12,
-                },
-                x=0.120,
-                y=0.911,
-            ),
-        ]
-    )
+    return infer_url(engine, url)
 
+
+@router.post("/draw")
+def draw_pose_from_url(*, url: AnyUrl, engine: OpenPoseEngine = Depends(get_openpose_engine)):
+    """
+    \f
+    :param url:
+    :param engine:
+    :return:
+    """
+    image = draw_url(engine, url)
+
+    return StreamingResponse(io.BytesIO(image), media_type="image/jpg")

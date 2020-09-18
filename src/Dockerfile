@@ -17,11 +17,11 @@ RUN apt-get update \
   && apt-get clean
 
 # install python dependencies
-RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 COPY ./requirements.txt .
 COPY ./requirements-test.txt .
 COPY ./requirements-dev.txt .
-RUN pip install -r requirements-dev.txt
+RUN pip3 install -r requirements-dev.txt
 
 # add app
 COPY . .

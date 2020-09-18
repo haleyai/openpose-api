@@ -1,6 +1,5 @@
 #!/usr/bin/env python3.8
 import logging
-import pyopenpose
 
 from fastapi import FastAPI
 from uvicorn import run

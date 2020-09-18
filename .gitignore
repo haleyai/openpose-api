@@ -1,5 +1,11 @@
+# ModelFiles
+*.caffemodel
+*ckpt-[0-9]*.data*
+saved_model.pb
+**/cv/models/*
+
 # Pycharm
-.idea/
+.idea/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
