@@ -7,6 +7,7 @@ from app.cv.openpose import get_openpose_engine
 from app.schemas.pose import Pose, Keypoint, keypoints_info
 from app.cv.engine import Engine
 
+
 BLACK = (0, 0, 0)
 GREY = (127, 127, 127)
 WHITE = (255, 200, 200)
@@ -35,6 +36,14 @@ def url_to_image(url):
     # it into OpenCV format
     resp = urlopen(url)
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    return image
+
+
+def file_to_image(file):
+    contents = file.file.read()
+    print(f">> Contents: [{contents[1:5]}...] of length {len(contents)}")
+    image = np.fromstring(contents, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
     return image
 
@@ -86,6 +95,20 @@ def draw_url(engine: Engine, url):
 
     draw_poses(image, poses)
 
+    res, out_image = cv2.imencode(".jpg", image)
+    return out_image.tostring()
+
+
+def infer_file(engine: Engine, file):
+    print("inferring from file")
+    image = file_to_image(file)
+    return engine.infer_image(image)
+
+
+def draw_file(engine: Engine, file):
+    image = file_to_image(file)
+    poses = engine.infer_image(image)
+    draw_poses(image, poses)
     res, out_image = cv2.imencode(".jpg", image)
     return out_image.tostring()
 

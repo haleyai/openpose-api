@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import List, Dict, Optional
-from pydantic import BaseModel
+from typing import List, Dict, Optional, Any
+from pydantic import BaseModel, Field
 
 
 class Side(int, Enum):
@@ -44,9 +44,27 @@ class KPMeta(BaseModel):
 
 
 class Point(BaseModel):
-    x: float
-    y: float
-    confidence: float
+    """
+    Relative point in an image
+    """
+    x: float = Field(
+        title="Relative X-Coordinate",
+        description="Represented as a float in the range [0.0,1.0], "
+                    "where 0.0 means the extreme left edge of the image"
+                    "and 1.0 means the extreme right edge of the image"
+    )
+    y: float = Field(
+        title="Relative Y-Coordinate",
+        description="Represented as a float in the range [0.0,1.0], "
+                    "where 0.0 means the extreme top edge of the image"
+                    "and 1.0 means the extreme bottom edge of the image"
+    )
+    confidence: float = Field(
+        title="confidence in the point accuracy",
+        description="Represented as a float in the range [0.0,1.0], "
+                    "where 0.0 means completely uncertain"
+                    "and 1.0 means complete confidence / 'certainty'"
+    )
 
 
 class Keypoint(Point):
@@ -54,31 +72,34 @@ class Keypoint(Point):
 
 
 class Pose(BaseModel):
-    nose: Optional[Keypoint]
-    neck: Optional[Keypoint]
-    right_shoulder: Optional[Keypoint]
-    right_elbow: Optional[Keypoint]
-    right_wrist: Optional[Keypoint]
-    left_shoulder: Optional[Keypoint]
-    left_elbow: Optional[Keypoint]
-    left_wrist: Optional[Keypoint]
-    mid_hip: Optional[Keypoint]
-    right_hip: Optional[Keypoint]
-    right_knee: Optional[Keypoint]
-    right_ankle: Optional[Keypoint]
-    left_hip: Optional[Keypoint]
-    left_knee: Optional[Keypoint]
-    left_ankle: Optional[Keypoint]
-    right_eye: Optional[Keypoint]
-    left_eye: Optional[Keypoint]
-    right_ear: Optional[Keypoint]
-    left_ear: Optional[Keypoint]
-    left_bigtoe: Optional[Keypoint]
-    left_smalltoe: Optional[Keypoint]
-    left_heel: Optional[Keypoint]
-    right_bigtoe: Optional[Keypoint]
-    right_smalltoe: Optional[Keypoint]
-    right_heel: Optional[Keypoint]
+    """
+    Detected location (relative image coordinates) of 25 main body joints / key-points.
+    """
+    nose: Optional[Point] = Field(title="Location of the Nose")
+    neck: Optional[Point] = Field(title="Location of the Neck")
+    right_shoulder: Optional[Point] = Field(title="Location of the Right Shoulder")
+    right_elbow: Optional[Point] = Field(title="Location of the Right Elbow")
+    right_wrist: Optional[Point] = Field(title="Location of the Right Wrist")
+    left_shoulder: Optional[Point] = Field(title="Location of the Left Shoulder")
+    left_elbow: Optional[Point] = Field(title="Location of the Left Elbow")
+    left_wrist: Optional[Point] = Field(title="Location of the Left Wrist")
+    mid_hip: Optional[Point] = Field(title="Location of the Groin")
+    right_hip: Optional[Point] = Field(title="Location of the Right Hip")
+    right_knee: Optional[Point] = Field(title="Location of the Right Knee")
+    right_ankle: Optional[Point] = Field(title="Location of the Right Ankle")
+    left_hip: Optional[Point] = Field(title="Location of the Left Hip")
+    left_knee: Optional[Point] = Field(title="Location of the Left Knee")
+    left_ankle: Optional[Point] = Field(title="Location of the Left Ankle")
+    right_eye: Optional[Point] = Field(title="Location of the Right Eye")
+    left_eye: Optional[Point] = Field(title="Location of the Left Eye")
+    right_ear: Optional[Point] = Field(title="Location of the right Ear")
+    left_ear: Optional[Point] = Field(title="Location of the Left Ear")
+    left_bigtoe: Optional[Point] = Field(title="Location of the Left Big-toe")
+    left_smalltoe: Optional[Point] = Field(title="Location of the Left Small-toe")
+    left_heel: Optional[Point] = Field(title="Location of the Left Heel")
+    right_bigtoe: Optional[Point] = Field(title="Location of the Right Big-toe")
+    right_smalltoe: Optional[Point] = Field(title="Location of the Right small-toe")
+    right_heel: Optional[Point] = Field(title="Location of the Right Heel")
 
     @staticmethod
     def from_keypoints(keypoints: List[Keypoint]) -> 'Pose':
@@ -87,6 +108,50 @@ class Pose(BaseModel):
 
     def get_keypoint(self, kpid:KPId) -> Keypoint:
         return self.__getattribute__(kpid)
+
+
+class Person(BaseModel):
+    """
+    Representation of a detected person, including:
+
+    - estimated age (disabled)
+    - estimated gender (disabled)
+    - pose
+    """
+    gender: Optional[float] = Field(
+        title="Estimated gender, if enabled.",
+        description="Represented as a float in the range [-1.0,1.0], "
+                    "where -1.0 means confidently male"
+                    "and 1.0 means confidently female"
+                    "and numbers close to 0.0 means uncertain"
+    )
+    age: Optional[int] = Field(title="Estimated age, if enabled")
+    pose: Optional[Pose] = Field(title="detected pose key-points")
+
+
+class Scene(BaseModel):
+    """
+    Representation of features of and in an image / scene, including:
+
+    - detected people
+    - detected vehicles (disabled)
+    - detected 'things' (disabled)
+    """
+    people: List[Person] = Field(
+        default_factory=lambda: [],
+        title="List of Persons",
+        description="List of detected People, in the form of Person objects.",
+    )
+    vehicles: List[Any] = Field(
+        default_factory=lambda: [],
+        title="List of Vehicles",
+        description="(Disabled) List of detected Vehicles, in the form of Vehicle objects.",
+    )
+    things: List[Any] = Field(
+        default_factory=lambda: [],
+        title="List of Things",
+        description="(Disabled) List of detected Things, in the form of Thing objects.",
+    )
 
 
 keypoints_info: Dict[KPId, KPMeta] = {

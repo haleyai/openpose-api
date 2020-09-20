@@ -11,6 +11,7 @@ log = logging.getLogger(logger_name)
 class Settings(BaseSettings):
     environment: str = os.getenv("ENVIRONMENT", "dev")
     testing: bool = os.getenv("TESTING", 0)
+    version: str = os.getenv("VERSION", "0.1.1")
     database_url: AnyUrl = os.environ.get("DATABASE_URL")
     token_validity_minutes: int = os.getenv("TOKEN_VALIDITY_MINUTES", 30)
     secret_key: str = os.getenv("TOKEN_SECRET_KEY", "hemlis")

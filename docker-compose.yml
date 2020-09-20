@@ -16,7 +16,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      - ENVIRONMENT=dev
+      - ENVIRONMENT=demo
       - TESTING=0
 #      - DATABASE_URL=postgres://${DBUSER}:${DBPASS}@postgres:5432/${COMPOSE_PROJECT_NAME}_dev
 #      - DATABASE_TEST_URL=postgres://${DBUSER}:${DBPASS}@postgres:5432/${COMPOSE_PROJECT_NAME}_tst
