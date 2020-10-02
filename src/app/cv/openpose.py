@@ -20,7 +20,7 @@ openpose_keypoints = [
 
 
 class OpenPoseEngine(Engine):
-    def __init__(self, model_folder="app/cv/models/", **kwargs):
+    def __init__(self, model_folder="/openpose/models/", **kwargs):
         print("initializing poser")
         params = dict()
         params["model_folder"] = model_folder
