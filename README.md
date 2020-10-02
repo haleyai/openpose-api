@@ -1,11 +1,26 @@
-# fastapi-docker-template
-A template repo to use as a starting point for building [Dockerized](https://www.docker.com/) APIs using Python 3.8 and [FastAPI](https://fastapi.tiangolo.com/). With strict and extensive code quality tools, like [black](https://github.com/psf/black), [flake8](https://gitlab.com/pycqa/flake8), [isort](https://pycqa.github.io/isort/), [pytest](https://docs.pytest.org) and [pytest-cov](https://github.com/pytest-dev/pytest-cov) right out of the box.
+# OpenPose API
+Simple containerized REST API extracting (and draw) [CMU OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose/) (human pose) key-points from images (provided as file or url). 
+This version is GPU accelerated, using CUDA (10.0) and CuDNN (7.5) compatible hardware, allowing to e
 
+## DocaPrerequisites
+Other container orchestration software, like Kubernetes may also be used, but Docker is the easiest. 
+- Nvidia GPU and drivers on the Host. 
+- [Docker](https://docs.docker.com/get-docker/)
+- [Nvidia Docker Runtime](https://github.com/NVIDIA/nvidia-docker)
+- [docker-compose](https://docs.docker.com/compose/install/)
+ 
 ## Getting Started
-To use this template, first generate a new repository from it, by clicking **"[Use this template](https://github.com/lyngon/fastapi-docker-template/generate)"** and select a name and visibility settings etc for the new repository.
-Then clone the new repository as normal, after which it is recommemnded to:
-1. Update the `.env` file in the repository root to reflect your new project. Paticularly:
-    - Change the `COMPOSE_PROJECT_NAME` variable to represent your project name.
-        
-        This variable will both be used as service prefix when running with *docker-compose*, as well as used   
+```
+git clone https://github.com/lyngon/openpose-api.git
+cd openpose-api
+docker-compose up -d
+```
+
+In a browser visit `http://localhost:8080/docs`. Assuming the browser is running on the same machine.
+If everything worked, you should see an interactive Swagger documentation wehere you can try out the API.  
+
+## To Do
+- Generalize to also run on CPU 
+- Kubernetes example
+
 
