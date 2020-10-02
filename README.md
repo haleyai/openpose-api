@@ -2,7 +2,7 @@
 Simple containerized REST API extracting (and draw) [CMU OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose/) (human pose) key-points from images (provided as file or url). 
 This version is GPU accelerated, using CUDA (10.0) and CuDNN (7.5) compatible hardware.
 
-## DocaPrerequisites
+## Prerequisites
 Other container orchestration software, like Kubernetes may also be used, but Docker is the easiest. 
 - Nvidia GPU and drivers on the Host. 
 - [Docker](https://docs.docker.com/get-docker/)
