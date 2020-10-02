@@ -1,6 +1,6 @@
 # OpenPose API
 Simple containerized REST API extracting (and draw) [CMU OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose/) (human pose) key-points from images (provided as file or url). 
-This version is GPU accelerated, using CUDA (10.0) and CuDNN (7.5) compatible hardware, allowing to e
+This version is GPU accelerated, using CUDA (10.0) and CuDNN (7.5) compatible hardware.
 
 ## DocaPrerequisites
 Other container orchestration software, like Kubernetes may also be used, but Docker is the easiest. 
