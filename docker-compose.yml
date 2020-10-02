@@ -15,5 +15,5 @@ services:
     ports:
       - 8080:8000
     environment:
-      - ENVIRONMENT=demo
-      - TESTING=0
+      - ENVIRONMENT=dev
+      - TESTING=True

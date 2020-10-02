@@ -4,8 +4,8 @@ import logging
 from fastapi import FastAPI
 from uvicorn import run
 
-from app.routes import pose, status
 from app.config import get_settings
+from app.routes import pose, status
 
 log = logging.getLogger(__name__)
 
@@ -25,11 +25,11 @@ Others may come at a later stage.
         """,
         version=get_settings().version,
         openapi_tags=[
-            {'name': 'pose', 'description': "Human Pose Estimation "},
-            {'name': "image", 'description': "Extract from image"},
-            {'name': "url", 'description': "Extract from URL"},
-            {'name': "draw", 'description': "Generate image with key-points drawn"},
-            {'name': "util", 'description': "Util features"}
+            {"name": "pose", "description": "Human Pose Estimation "},
+            {"name": "image", "description": "Extract from image"},
+            {"name": "url", "description": "Extract from URL"},
+            {"name": "draw", "description": "Generate image with key-points drawn"},
+            {"name": "util", "description": "Util features"},
         ],
     )
     fast_api.include_router(status.router, prefix="/status", tags=["util"])

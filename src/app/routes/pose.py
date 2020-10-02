@@ -1,7 +1,11 @@
 from pydantic import AnyHttpUrl
 import io
 from fastapi import (
-    APIRouter, Depends, UploadFile, File, Body,
+    APIRouter,
+    Depends,
+    UploadFile,
+    File,
+    Body,
 )
 from starlette.responses import StreamingResponse
 
@@ -26,18 +30,18 @@ A Scene object containing detected objects, such as:
 - people: detected people
 - vehicles: detected vehicles (disabled)
 - things: detected 'things' (disabled) 
-"""
+""",
 )
 def extract_pose_from_url(
-        *,
-        url: AnyHttpUrl = Body(
-            ...,
-            embed=True,
-            title="URL pointing to an image",
-            description="Valid URL for a jpeg or png image",
-            example="https://upload.wikimedia.org/wikipedia/commons/3/38/Two_dancers.jpg"
-        ),
-        engine: Engine = Depends(get_engine)
+    *,
+    url: AnyHttpUrl = Body(
+        ...,
+        embed=True,
+        title="URL pointing to an image",
+        description="Valid URL for a jpeg or png image",
+        example="https://upload.wikimedia.org/wikipedia/commons/3/38/Two_dancers.jpg",
+    ),
+    engine: Engine = Depends(get_engine)
 ):
     """
     ## Extract Pose From URL
@@ -49,9 +53,7 @@ def extract_pose_from_url(
     :return: A Scene object representing the detected features in the image.
     """
     poses = infer_url(engine, url)
-    return Scene(
-        people=[Person(pose=pose) for pose in poses]
-    )
+    return Scene(people=[Person(pose=pose) for pose in poses])
 
 
 @router.post(
@@ -61,18 +63,18 @@ def extract_pose_from_url(
     response_description="""
 ### Successful Response:
 A JPEG image with the detected features drawn
-"""
+""",
 )
 def draw_pose_from_url(
-        *,
-        url: AnyHttpUrl = Body(
-            ...,
-            embed=True,
-            title="URL pointing to an image",
-            description="Valid URL for a jpeg or png image",
-            example="https://upload.wikimedia.org/wikipedia/commons/3/38/Two_dancers.jpg"
-        ),
-        engine: Engine = Depends(get_engine)
+    *,
+    url: AnyHttpUrl = Body(
+        ...,
+        embed=True,
+        title="URL pointing to an image",
+        description="Valid URL for a jpeg or png image",
+        example="https://upload.wikimedia.org/wikipedia/commons/3/38/Two_dancers.jpg",
+    ),
+    engine: Engine = Depends(get_engine)
 ):
     """
     ## Draw Pose From URL
@@ -101,7 +103,9 @@ A Scene object containing detected objects, such as:
 - things: detected 'things' (disabled) 
 """,
 )
-def extract_pose_from_file(*, image_file: UploadFile = File(...), engine: Engine =Depends(get_engine)):
+def extract_pose_from_file(
+    *, image_file: UploadFile = File(...), engine: Engine = Depends(get_engine)
+):
     """
     ## Extract Pose From Image
     Extract pose information, from an image file,
@@ -112,9 +116,7 @@ def extract_pose_from_file(*, image_file: UploadFile = File(...), engine: Engine
     :return: A Scene object representing the detected features in the image.
     """
     poses = infer_file(engine, image_file)
-    return Scene(
-        people=[Person(pose=pose) for pose in poses]
-    )
+    return Scene(people=[Person(pose=pose) for pose in poses])
 
 
 @router.post(
@@ -126,7 +128,9 @@ def extract_pose_from_file(*, image_file: UploadFile = File(...), engine: Engine
 A JPEG image with the detected features drawn
 """,
 )
-def draw_pose_from_file(*, image_file: UploadFile = File(...), engine: Engine =Depends(get_engine)):
+def draw_pose_from_file(
+    *, image_file: UploadFile = File(...), engine: Engine = Depends(get_engine)
+):
     """
     ## Draw Pose From Image
     Create a ned image with scene (pose) information drawn, from an image file,

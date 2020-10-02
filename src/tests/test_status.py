@@ -1,3 +1,6 @@
+from app.config import get_settings
+
+
 def test_status(test_app):
     # Given
     # test_app
@@ -8,7 +11,8 @@ def test_status(test_app):
     # Then
     assert response.status_code == 200
     assert response.json() == {
-        "environment": "dev",
+        "version": get_settings().version,
         "status": "running",
-        "testing": True,
+        "environment": get_settings().environment,
+        "testing": get_settings().testing,
     }

@@ -47,23 +47,24 @@ class Point(BaseModel):
     """
     Relative point in an image
     """
+
     x: float = Field(
         title="Relative X-Coordinate",
         description="Represented as a float in the range [0.0,1.0], "
-                    "where 0.0 means the extreme left edge of the image"
-                    "and 1.0 means the extreme right edge of the image"
+        "where 0.0 means the extreme left edge of the image"
+        "and 1.0 means the extreme right edge of the image",
     )
     y: float = Field(
         title="Relative Y-Coordinate",
         description="Represented as a float in the range [0.0,1.0], "
-                    "where 0.0 means the extreme top edge of the image"
-                    "and 1.0 means the extreme bottom edge of the image"
+        "where 0.0 means the extreme top edge of the image"
+        "and 1.0 means the extreme bottom edge of the image",
     )
     confidence: float = Field(
         title="confidence in the point accuracy",
         description="Represented as a float in the range [0.0,1.0], "
-                    "where 0.0 means completely uncertain"
-                    "and 1.0 means complete confidence / 'certainty'"
+        "where 0.0 means completely uncertain"
+        "and 1.0 means complete confidence / 'certainty'",
     )
 
 
@@ -75,6 +76,7 @@ class Pose(BaseModel):
     """
     Detected location (relative image coordinates) of 25 main body joints / key-points.
     """
+
     nose: Optional[Point] = Field(title="Location of the Nose")
     neck: Optional[Point] = Field(title="Location of the Neck")
     right_shoulder: Optional[Point] = Field(title="Location of the Right Shoulder")
@@ -102,11 +104,11 @@ class Pose(BaseModel):
     right_heel: Optional[Point] = Field(title="Location of the Right Heel")
 
     @staticmethod
-    def from_keypoints(keypoints: List[Keypoint]) -> 'Pose':
+    def from_keypoints(keypoints: List[Keypoint]) -> "Pose":
         points = dict([(kpt.id, kpt) for kpt in keypoints])
         return Pose(**points)
 
-    def get_keypoint(self, kpid:KPId) -> Keypoint:
+    def get_keypoint(self, kpid: KPId) -> Keypoint:
         return self.__getattribute__(kpid)
 
 
@@ -118,12 +120,13 @@ class Person(BaseModel):
     - estimated gender (disabled)
     - pose
     """
+
     gender: Optional[float] = Field(
         title="Estimated gender, if enabled.",
         description="Represented as a float in the range [-1.0,1.0], "
-                    "where -1.0 means confidently male"
-                    "and 1.0 means confidently female"
-                    "and numbers close to 0.0 means uncertain"
+        "where -1.0 means confidently male"
+        "and 1.0 means confidently female"
+        "and numbers close to 0.0 means uncertain",
     )
     age: Optional[int] = Field(title="Estimated age, if enabled")
     pose: Optional[Pose] = Field(title="detected pose key-points")
@@ -137,6 +140,7 @@ class Scene(BaseModel):
     - detected vehicles (disabled)
     - detected 'things' (disabled)
     """
+
     people: List[Person] = Field(
         default_factory=lambda: [],
         title="List of Persons",
@@ -156,103 +160,146 @@ class Scene(BaseModel):
 
 keypoints_info: Dict[KPId, KPMeta] = {
     KPId.nose: KPMeta(
-        description="Nose", side=Side.MID,
-        connects=[KPId.neck, KPId.right_eye, KPId.left_eye, KPId.right_ear, KPId.left_ear]
+        description="Nose",
+        side=Side.MID,
+        connects=[
+            KPId.neck,
+            KPId.right_eye,
+            KPId.left_eye,
+            KPId.right_ear,
+            KPId.left_ear,
+        ],
     ),
     KPId.neck: KPMeta(
-        description="Neck", side=Side.MID,
-        connects=[KPId.nose, KPId.right_shoulder, KPId.left_shoulder, KPId.mid_hip, KPId.right_hip, KPId.left_hip]
+        description="Neck",
+        side=Side.MID,
+        connects=[
+            KPId.nose,
+            KPId.right_shoulder,
+            KPId.left_shoulder,
+            KPId.mid_hip,
+            KPId.right_hip,
+            KPId.left_hip,
+        ],
     ),
     KPId.right_shoulder: KPMeta(
-        description="RShoulder", side=Side.RIGHT,
-        connects=[KPId.neck, KPId.right_elbow, KPId.left_shoulder, KPId.mid_hip, KPId.right_hip, KPId.left_hip]
+        description="RShoulder",
+        side=Side.RIGHT,
+        connects=[
+            KPId.neck,
+            KPId.right_elbow,
+            KPId.left_shoulder,
+            KPId.mid_hip,
+            KPId.right_hip,
+            KPId.left_hip,
+        ],
     ),
     KPId.right_elbow: KPMeta(
-        description="RElbow", side=Side.RIGHT,
-        connects=[KPId.right_shoulder, KPId.right_wrist]
+        description="RElbow",
+        side=Side.RIGHT,
+        connects=[KPId.right_shoulder, KPId.right_wrist],
     ),
     KPId.right_wrist: KPMeta(
-        description="RWrist", side=Side.RIGHT,
-        connects=[KPId.right_elbow]
+        description="RWrist", side=Side.RIGHT, connects=[KPId.right_elbow]
     ),
     KPId.left_shoulder: KPMeta(
-        description="LShoulder", side=Side.LEFT,
-        connects=[KPId.neck, KPId.right_shoulder, KPId.left_elbow, KPId.mid_hip, KPId.right_hip, KPId.left_hip]
+        description="LShoulder",
+        side=Side.LEFT,
+        connects=[
+            KPId.neck,
+            KPId.right_shoulder,
+            KPId.left_elbow,
+            KPId.mid_hip,
+            KPId.right_hip,
+            KPId.left_hip,
+        ],
     ),
     KPId.left_elbow: KPMeta(
-        description="LElbow", side=Side.LEFT,
-        connects=[KPId.left_shoulder, KPId.left_wrist]
+        description="LElbow",
+        side=Side.LEFT,
+        connects=[KPId.left_shoulder, KPId.left_wrist],
     ),
     KPId.left_wrist: KPMeta(
-        description="LWrist", side=Side.LEFT,
-        connects=[KPId.left_elbow]
+        description="LWrist", side=Side.LEFT, connects=[KPId.left_elbow]
     ),
     KPId.mid_hip: KPMeta(
-        description="MidHip", side=Side.MID,
-        connects=[KPId.neck, KPId.right_shoulder, KPId.left_shoulder, KPId.right_hip, KPId.left_hip]
+        description="MidHip",
+        side=Side.MID,
+        connects=[
+            KPId.neck,
+            KPId.right_shoulder,
+            KPId.left_shoulder,
+            KPId.right_hip,
+            KPId.left_hip,
+        ],
     ),
     KPId.right_hip: KPMeta(
-        description="RHip", side=Side.RIGHT,
-        connects=[KPId.neck, KPId.right_shoulder, KPId.left_shoulder, KPId.mid_hip, KPId.right_knee, KPId.left_hip]
+        description="RHip",
+        side=Side.RIGHT,
+        connects=[
+            KPId.neck,
+            KPId.right_shoulder,
+            KPId.left_shoulder,
+            KPId.mid_hip,
+            KPId.right_knee,
+            KPId.left_hip,
+        ],
     ),
     KPId.right_knee: KPMeta(
-        description="RKnee", side=Side.RIGHT,
-        connects=[KPId.right_hip, KPId.right_ankle]
+        description="RKnee",
+        side=Side.RIGHT,
+        connects=[KPId.right_hip, KPId.right_ankle],
     ),
     KPId.right_ankle: KPMeta(
-        description="RAnkle", side=Side.RIGHT,
-        connects=[KPId.right_knee, KPId.right_bigtoe, KPId.right_smalltoe, KPId.right_heel]
+        description="RAnkle",
+        side=Side.RIGHT,
+        connects=[
+            KPId.right_knee,
+            KPId.right_bigtoe,
+            KPId.right_smalltoe,
+            KPId.right_heel,
+        ],
     ),
     KPId.left_hip: KPMeta(
-        description="LHip", side=Side.LEFT,
-        connects=[KPId.neck, KPId.right_shoulder, KPId.left_shoulder, KPId.mid_hip, KPId.right_hip, KPId.left_knee]
+        description="LHip",
+        side=Side.LEFT,
+        connects=[
+            KPId.neck,
+            KPId.right_shoulder,
+            KPId.left_shoulder,
+            KPId.mid_hip,
+            KPId.right_hip,
+            KPId.left_knee,
+        ],
     ),
     KPId.left_knee: KPMeta(
-        description="LKnee", side=Side.LEFT,
-        connects=[KPId.left_hip, KPId.left_ankle]
+        description="LKnee", side=Side.LEFT, connects=[KPId.left_hip, KPId.left_ankle]
     ),
     KPId.left_ankle: KPMeta(
-        description="LAnkle", side=Side.LEFT,
-        connects=[KPId.left_knee, KPId.left_bigtoe, KPId.left_smalltoe, KPId.left_heel]
+        description="LAnkle",
+        side=Side.LEFT,
+        connects=[KPId.left_knee, KPId.left_bigtoe, KPId.left_smalltoe, KPId.left_heel],
     ),
-    KPId.right_eye: KPMeta(
-        description="REye", side=Side.RIGHT,
-        connects=[KPId.nose]
-    ),
-    KPId.left_eye: KPMeta(
-        description="LEye", side=Side.LEFT,
-        connects=[KPId.nose]
-    ),
-    KPId.right_ear: KPMeta(
-        description="REar", side=Side.RIGHT,
-        connects=[KPId.nose]
-    ),
-    KPId.left_ear: KPMeta(
-        description="LEar", side=Side.LEFT,
-        connects=[KPId.nose]
-    ),
+    KPId.right_eye: KPMeta(description="REye", side=Side.RIGHT, connects=[KPId.nose]),
+    KPId.left_eye: KPMeta(description="LEye", side=Side.LEFT, connects=[KPId.nose]),
+    KPId.right_ear: KPMeta(description="REar", side=Side.RIGHT, connects=[KPId.nose]),
+    KPId.left_ear: KPMeta(description="LEar", side=Side.LEFT, connects=[KPId.nose]),
     KPId.left_bigtoe: KPMeta(
-        description="LBigToe", side=Side.LEFT,
-        connects=[KPId.left_ankle]
+        description="LBigToe", side=Side.LEFT, connects=[KPId.left_ankle]
     ),
     KPId.left_smalltoe: KPMeta(
-        description="LSmallToe", side=Side.LEFT,
-        connects=[KPId.left_ankle]
+        description="LSmallToe", side=Side.LEFT, connects=[KPId.left_ankle]
     ),
     KPId.left_heel: KPMeta(
-        description="LHeel", side=Side.LEFT,
-        connects=[KPId.left_ankle]
+        description="LHeel", side=Side.LEFT, connects=[KPId.left_ankle]
     ),
     KPId.right_bigtoe: KPMeta(
-        description="RBigToe", side=Side.RIGHT,
-        connects=[KPId.right_ankle]
+        description="RBigToe", side=Side.RIGHT, connects=[KPId.right_ankle]
     ),
     KPId.right_smalltoe: KPMeta(
-        description="RSmallToe", side=Side.RIGHT,
-        connects=[KPId.right_ankle]
+        description="RSmallToe", side=Side.RIGHT, connects=[KPId.right_ankle]
     ),
     KPId.right_heel: KPMeta(
-        description="RHeel", side=Side.RIGHT,
-        connects=[KPId.right_ankle]
+        description="RHeel", side=Side.RIGHT, connects=[KPId.right_ankle]
     ),
 }

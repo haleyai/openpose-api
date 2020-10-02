@@ -6,16 +6,31 @@ import numpy as np
 import pyopenpose as op
 
 openpose_keypoints = [
-    KPId.nose, KPId.neck,
-    KPId.right_shoulder, KPId.right_elbow, KPId.right_wrist,
-    KPId.left_shoulder, KPId.left_elbow, KPId.left_wrist,
+    KPId.nose,
+    KPId.neck,
+    KPId.right_shoulder,
+    KPId.right_elbow,
+    KPId.right_wrist,
+    KPId.left_shoulder,
+    KPId.left_elbow,
+    KPId.left_wrist,
     KPId.mid_hip,
-    KPId.right_hip, KPId.right_knee, KPId.right_ankle,
-    KPId.left_hip, KPId.left_knee, KPId.left_ankle,
-    KPId.right_eye, KPId.left_eye,
-    KPId.right_ear, KPId.left_ear,
-    KPId.left_bigtoe, KPId.left_smalltoe, KPId.left_heel,
-    KPId.right_bigtoe, KPId.right_smalltoe, KPId.right_heel
+    KPId.right_hip,
+    KPId.right_knee,
+    KPId.right_ankle,
+    KPId.left_hip,
+    KPId.left_knee,
+    KPId.left_ankle,
+    KPId.right_eye,
+    KPId.left_eye,
+    KPId.right_ear,
+    KPId.left_ear,
+    KPId.left_bigtoe,
+    KPId.left_smalltoe,
+    KPId.left_heel,
+    KPId.right_bigtoe,
+    KPId.right_smalltoe,
+    KPId.right_heel,
 ]
 
 
@@ -52,8 +67,9 @@ class OpenPoseEngine(Engine):
                     person_keypoints.append(
                         Keypoint(
                             id=openpose_keypoints[ix],
-                            x=detected_kpt[0] / width, y=detected_kpt[1] / height,
-                            confidence=detected_kpt[2]
+                            x=detected_kpt[0] / width,
+                            y=detected_kpt[1] / height,
+                            confidence=detected_kpt[2],
                         )
                     )
             poses.append(Pose.from_keypoints(keypoints=person_keypoints))

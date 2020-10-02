@@ -23,7 +23,7 @@ thickness = 1
 colours = [WHITE, RED, GREEN]
 
 
-def pixel(keypoint: Keypoint, width:int, height:int):
+def pixel(keypoint: Keypoint, width: int, height: int):
     if keypoint is None:
         return 0, 0
     x = 0 if keypoint.x is None or np.isnan(keypoint.x) else int(keypoint.x * width)
@@ -68,7 +68,7 @@ def draw_poses(image, poses: List[Pose]):
             kppxl = pixel(kp, width=width, height=height)
             image = cv2.circle(image, kppxl, kpt_size, colour, kpt_thickness)
             # Write Confidence
-#            image = cv2.putText(image, f"{kp.confidence:.3f}", kppxl, font, fontScale, colour, 1, cv2.LINE_AA)
+            #            image = cv2.putText(image, f"{kp.confidence:.3f}", kppxl, font, fontScale, colour, 1, cv2.LINE_AA)
 
             for neighbor_id in kpinfo.connects:
                 neighbor = pose.get_keypoint(neighbor_id)
@@ -80,7 +80,13 @@ def draw_poses(image, poses: List[Pose]):
                         colour = colours[0]  # "MID" colour
 
                     # Draw the line
-                    image = cv2.line(image, kppxl, pixel(neighbor, width=width, height=height), colour, thickness)
+                    image = cv2.line(
+                        image,
+                        kppxl,
+                        pixel(neighbor, width=width, height=height),
+                        colour,
+                        thickness,
+                    )
 
 
 def infer_url(engine: Engine, url):
