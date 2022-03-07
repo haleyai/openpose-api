@@ -1,5 +1,6 @@
 # pull official base image
-FROM lyngon/pyopenpose
+
+FROM cwaffles/openpose
 
 ARG app_name=api
 
@@ -22,9 +23,16 @@ COPY ./requirements.txt .
 COPY ./requirements-test.txt .
 COPY ./requirements-dev.txt .
 RUN pip3 install -r requirements-dev.txt
+# RUN pip3 install python-multipart
 
 # add app
 COPY . .
+
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+RUN ln -s /openpose/build/python/openpose/pyopenpose.cpython-36m-x86_64-linux-gnu.so /usr/local/lib/python3.6/dist-packages/
+
 
 # run entrypoint.sh
 ENTRYPOINT ["/usr/src/entrypoint.sh"]

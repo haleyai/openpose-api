@@ -119,6 +119,6 @@ def draw_file(engine: Engine, file):
     return out_image.tostring()
 
 
-@lru_cache
+@lru_cache()
 def get_engine() -> Engine:
     return get_openpose_engine()

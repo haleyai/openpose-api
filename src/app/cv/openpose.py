@@ -80,6 +80,6 @@ class OpenPoseEngine(Engine):
 engine = OpenPoseEngine()
 
 
-@lru_cache
+@lru_cache()
 def get_openpose_engine():
     return engine
