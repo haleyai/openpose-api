@@ -286,6 +286,9 @@ Other container orchestration software, like Kubernetes may also be used, but Do
 - [docker-compose](https://docs.docker.com/compose/install/)
  
 ## Getting Started
+
+Build or download openpose container [haleyai/openpose](https://github.com/haleyai/openpose-docker/).
+
 ```
 git clone https://github.com/lyngon/openpose-api.git
 cd openpose-api
