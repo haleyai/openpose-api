@@ -55,7 +55,7 @@ class OpenPoseEngine(Engine):
 
         datum = op.Datum()
         datum.cvInputData = image
-        self._opWrapper.emplaceAndPop([datum])
+        self._opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
         raw_keypoints = datum.poseKeypoints
 

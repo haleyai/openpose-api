@@ -1,6 +1,7 @@
 # pull official base image
 
-FROM cwaffles/openpose
+# FROM cwaffles/openpose
+FROM haleyai/openpose
 
 ARG app_name=api
 
