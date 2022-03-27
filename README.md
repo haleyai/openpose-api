@@ -295,7 +295,7 @@ cd openpose-api
 docker-compose up -d
 ```
 
-In a browser visit `http://localhost:8080/docs`. Assuming the browser is running on the same machine.
+In a browser visit `http://localhost:8000/docs`. Assuming the browser is running on the same machine.
 If everything worked, you should see an interactive Swagger documentation wehere you can try out the API.  
 
 ## To Do
