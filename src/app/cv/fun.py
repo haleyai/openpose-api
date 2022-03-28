@@ -4,7 +4,7 @@ import numpy as np
 from typing import List
 from urllib.request import urlopen
 from app.cv.openpose import get_openpose_engine
-from app.schemas.pose import Pose, Keypoint, keypoints_info
+from app.schemas.pose import Keypoint, Person
 from app.cv.engine import Engine
 
 
@@ -19,8 +19,23 @@ RED = (0, 0, 200)
 font = cv2.FONT_HERSHEY_PLAIN
 fontScale = 1
 default_colour = (0, 0, 0)
-thickness = 1
+thickness = 3
 colours = [WHITE, RED, GREEN]
+
+BODY_DRAW_STYLE = {
+    'color': RED,
+    'thickness': 3,
+                  }
+
+HAND_DRAW_STYLE = {
+    'color': WHITE,
+    'thickness': 1,
+}
+
+FACE_DRAW_STYLE = {
+    'color': WHITE,
+    'thickness': 1,
+}
 
 
 def pixel(keypoint: Keypoint, width: int, height: int):
@@ -48,45 +63,32 @@ def file_to_image(file):
     return image
 
 
-def draw_poses(image, poses: List[Pose]):
+def draw_persons(image, persons: List[Person]):
 
     height, width, _ = np.shape(image)
 
-    for pose in poses:
-        for kpid, kpinfo in keypoints_info.items():
-
-            kp: Keypoint = pose.get_keypoint(kpid)
-
-            if kp is None:
+    for person in persons:
+        for pose, draw_style in zip(
+                [person.pose, person.face_pose, person.left_hand_pose, person.right_hand_pose],
+                [BODY_DRAW_STYLE, FACE_DRAW_STYLE, HAND_DRAW_STYLE, HAND_DRAW_STYLE]):
+            if pose is None:
                 continue
-
-            colour = colours[kpinfo.side]
-            kpt_thickness = 1  # int(kp.confidence * 3)
-            kpt_size = int(kp.confidence * 3)
-
-            # Draw keypoint
-            kppxl = pixel(kp, width=width, height=height)
-            image = cv2.circle(image, kppxl, kpt_size, colour, kpt_thickness)
-            # Write Confidence
-            #            image = cv2.putText(image, f"{kp.confidence:.3f}", kppxl, font, fontScale, colour, 1, cv2.LINE_AA)
-
-            for neighbor_id in kpinfo.connects:
-                neighbor = pose.get_keypoint(neighbor_id)
-                if neighbor is not None and neighbor.confidence > kp.confidence:
-                    # Set the line colour to match the points if they agree, neutral otherwise,
-                    if kpinfo.side == keypoints_info[neighbor_id].side:
-                        colour = colours[kpinfo.side]
-                    else:
-                        colour = colours[0]  # "MID" colour
-
-                    # Draw the line
+            for line in pose._skeleton:
+                for kpid1, kpid2 in zip(line[:-1], line[1:]):
+                    kp1: Keypoint = pose.get_keypoint(kpid1)
+                    kp2: Keypoint = pose.get_keypoint(kpid2)
+                    pixel1 = pixel(kp1, width=width, height=height)
+                    pixel2 = pixel(kp2, width=width, height=height)
+                    if pixel1 == (0, 0) or pixel2 == (0, 0):
+                        continue
                     image = cv2.line(
                         image,
-                        kppxl,
-                        pixel(neighbor, width=width, height=height),
-                        colour,
-                        thickness,
+                        pixel1,
+                        pixel2,
+                        draw_style['color'],
+                        draw_style['thickness'],
                     )
+    return image
 
 
 def infer_url(engine: Engine, url):
@@ -97,9 +99,9 @@ def infer_url(engine: Engine, url):
 
 def draw_url(engine: Engine, url):
     image = url_to_image(url)
-    poses = engine.infer_image(image)
+    persons = engine.infer_image(image)
 
-    draw_poses(image, poses)
+    draw_persons(image, persons)
 
     res, out_image = cv2.imencode(".jpg", image)
     return out_image.tostring()
@@ -113,8 +115,8 @@ def infer_file(engine: Engine, file):
 
 def draw_file(engine: Engine, file):
     image = file_to_image(file)
-    poses = engine.infer_image(image)
-    draw_poses(image, poses)
+    persons = engine.infer_image(image)
+    draw_persons(image, persons)
     res, out_image = cv2.imencode(".jpg", image)
     return out_image.tostring()
 

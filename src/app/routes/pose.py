@@ -11,8 +11,7 @@ from starlette.responses import StreamingResponse
 
 from app.cv.fun import infer_url, draw_url, infer_file, draw_file, get_engine
 from app.cv.engine import Engine
-from typing import List, Optional
-from app.schemas.pose import Person, Pose, Scene
+from app.schemas.pose import Scene
 
 
 router = APIRouter()
@@ -52,8 +51,8 @@ def extract_pose_from_url(
     :param engine: Pose Engine
     :return: A Scene object representing the detected features in the image.
     """
-    poses = infer_url(engine, url)
-    return Scene(people=[Person(pose=pose) for pose in poses])
+    persons = infer_url(engine, url)
+    return Scene(people=persons)
 
 
 @router.post(
@@ -115,8 +114,8 @@ def extract_pose_from_file(
     :param engine: Pose Engine
     :return: A Scene object representing the detected features in the image.
     """
-    poses = infer_file(engine, image_file)
-    return Scene(people=[Person(pose=pose) for pose in poses])
+    persons = infer_file(engine, image_file)
+    return Scene(people=persons)
 
 
 @router.post(
