@@ -154,7 +154,7 @@ class KPId(str, Enum):
 
 body_skeleton = [
     [KPId.left_ear, KPId.left_eye, KPId.nose, KPId.right_eye, KPId.right_ear,],
-    [KPId.left_wrist, KPId.left_elbow, KPId.left_elbow,
+    [KPId.left_wrist, KPId.left_elbow, KPId.left_elbow, KPId.left_shoulder,
      KPId.neck,
      KPId.right_shoulder, KPId.right_elbow, KPId.right_wrist,],
     [KPId.nose, KPId.neck, KPId.mid_hip,],
