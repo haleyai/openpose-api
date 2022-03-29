@@ -1,5 +1,5 @@
 from functools import lru_cache
-from app.schemas.pose import KPId, Keypoint, Pose, LeftHandPose, RightHandPose, FacePose, Person
+from app.schemas.pose import KPId, Keypoint, BodyPose, LeftHandPose, RightHandPose, FacePose, Person
 from typing import List
 from app.cv.engine import Engine
 from itertools import zip_longest
@@ -199,8 +199,24 @@ class OpenPoseEngine(Engine):
         datum.cvInputData = image
         self._opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
-        poses = [
-            Pose.from_keypoints(keypoints=keypoints)
+        bounding_boxes = []
+        for person_keypoints in zip_longest(datum.poseKeypoints,
+                                 datum.handKeypoints[0],
+                                 datum.handKeypoints[1],
+                                 datum.faceKeypoints,
+                                 fillvalue=None):
+            # filter out None points
+            valid_keypoints = np.vstack([keypoints for keypoints in person_keypoints if keypoints is not None])
+            # filter out all zeros undefined points
+            valid_keypoints = valid_keypoints[np.all(valid_keypoints != 0, axis=1), :]
+            # shape=(n_keypoints, 3)
+            bounding_boxes.append((
+                valid_keypoints[:, 0].min() / width, valid_keypoints[:, 1].min() / height,
+                valid_keypoints[:, 0].max() / width, valid_keypoints[:, 1].max() / height,
+            ))
+
+        person_keypoints = [
+            BodyPose.from_keypoints(keypoints=keypoints)
             for keypoints in
             self.__keypoints_from_array(
                  datum.poseKeypoints,
@@ -236,9 +252,15 @@ class OpenPoseEngine(Engine):
                 height)
         ]
         return [
-            Person(pose=pose, left_hand_pose=lhand, right_hand_pose=rhand, face_pose=face)
-            for pose, lhand, rhand, face in
-            zip_longest(poses, left_hand_poses, right_hand_poses, face_poses, fillvalue=None)
+            Person(pose=pose, left_hand_pose=lhand, right_hand_pose=rhand, face_pose=face,
+                   bounding_box=bbox)
+            for pose, lhand, rhand, face, bbox in
+            zip_longest(person_keypoints,
+                        left_hand_poses,
+                        right_hand_poses,
+                        face_poses,
+                        bounding_boxes,
+                        fillvalue=None)
         ]
 
 

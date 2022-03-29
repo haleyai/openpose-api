@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Tuple
 from pydantic import BaseModel, Field
 
 
@@ -237,6 +237,11 @@ class Keypoint(Point):
 
 
 class Pose(BaseModel):
+    def get_keypoint(self, kpid: KPId) -> Keypoint:
+        return self.__getattribute__(kpid)
+
+
+class BodyPose(Pose):
     """
     Detected location (relative image coordinates) of 25 main body joints / key-points.
     """
@@ -269,15 +274,12 @@ class Pose(BaseModel):
     right_heel: Optional[Point] = Field(title="Location of the Right Heel")
 
     @staticmethod
-    def from_keypoints(keypoints: List[Keypoint]) -> "Pose":
+    def from_keypoints(keypoints: List[Keypoint]) -> "BodyPose":
         points = dict([(kpt.id, kpt) for kpt in keypoints])
-        return Pose(**points)
-
-    def get_keypoint(self, kpid: KPId) -> Keypoint:
-        return self.__getattribute__(kpid)
+        return BodyPose(**points)
 
 
-class LeftHandPose(BaseModel):
+class LeftHandPose(Pose):
     """
     Detected location (relative image coordinates) of left hand joints / key-points.
     """
@@ -310,11 +312,8 @@ class LeftHandPose(BaseModel):
         points = dict([(kpt.id, kpt) for kpt in keypoints])
         return LeftHandPose(**points)
 
-    def get_keypoint(self, kpid: KPId) -> Keypoint:
-        return self.__getattribute__(kpid)
 
-
-class RightHandPose(BaseModel):
+class RightHandPose(Pose):
     """
     Detected location (relative image coordinates) of right hand joints / key-points.
     """
@@ -347,11 +346,8 @@ class RightHandPose(BaseModel):
         points = dict([(kpt.id, kpt) for kpt in keypoints])
         return RightHandPose(**points)
 
-    def get_keypoint(self, kpid: KPId) -> Keypoint:
-        return self.__getattribute__(kpid)
 
-
-class FacePose(BaseModel):
+class FacePose(Pose):
     """
     Detected location (relative image coordinates) of 70 face key-points.
     """
@@ -433,9 +429,6 @@ class FacePose(BaseModel):
         points = dict([(kpt.id, kpt) for kpt in keypoints])
         return FacePose(**points)
 
-    def get_keypoint(self, kpid: KPId) -> Keypoint:
-        return self.__getattribute__(kpid)
-
 
 class Person(BaseModel):
     """
@@ -447,6 +440,7 @@ class Person(BaseModel):
     - left and right hand
     - face
     """
+    bounding_box: Optional[Tuple[float, float, float, float]] = Field(title="Object bounding box x1y1x2y2")
 
     gender: Optional[float] = Field(
         title="Estimated gender, if enabled.",
@@ -456,7 +450,7 @@ class Person(BaseModel):
         "and numbers close to 0.0 means uncertain",
     )
     age: Optional[int] = Field(title="Estimated age, if enabled")
-    pose: Optional[Pose] = Field(title="detected pose key-points")
+    pose: Optional[BodyPose] = Field(title="detected pose key-points")
     left_hand_pose: Optional[LeftHandPose] = Field(title="detected left hand key-points")
     right_hand_pose: Optional[RightHandPose] = Field(title="detected right hand key-points")
     face_pose: Optional[FacePose] = Field(title="detected face key-points")

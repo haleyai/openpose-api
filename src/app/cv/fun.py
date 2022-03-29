@@ -88,6 +88,13 @@ def draw_persons(image, persons: List[Person]):
                         draw_style['color'],
                         draw_style['thickness'],
                     )
+        bbox_pixels = tuple(np.multiply(np.array(person.bounding_box).reshape((2, 2)), np.array([width, height])).
+                            round().astype(int).flatten())
+        cv2.rectangle(image,
+                      bbox_pixels[0:2],
+                      bbox_pixels[2:4],
+                      BLACK)  # ,
+                      # thickness=1)
     return image
 
 
