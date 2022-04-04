@@ -289,10 +289,16 @@ Other container orchestration software, like Kubernetes may also be used, but Do
 
 Build or download openpose container [haleyai/openpose](https://github.com/haleyai/openpose-docker/).
 
+development setting (reloads on source file change, ...):
 ```
-git clone https://github.com/lyngon/openpose-api.git
 cd openpose-api
-docker-compose up -d
+docker-compose -f docker-compose-dev.yml up
+```
+
+production setting:
+```
+cd openpose-api
+docker-compose up
 ```
 
 In a browser visit `http://localhost:8000/docs`. Assuming the browser is running on the same machine.
