@@ -9,10 +9,12 @@ services:
       dockerfile: Dockerfile
       args:
         app_name: ${COMPOSE_PROJECT_NAME}
-    command: gunicorn -k uvicorn.workers.UvicornWorker --workers 1 --bind=0.0.0.0:8000 app.main:api
+    command: uvicorn app.main:api --reload --workers 1 --host 0.0.0.0 --port 8000
     runtime: nvidia
     volumes:
       - ./src:/usr/src
     ports:
       - 8000:8000
-
+    environment:
+      - ENVIRONMENT=dev
+      - TESTING=True
