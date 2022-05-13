@@ -172,6 +172,8 @@ class OpenPoseEngine(Engine):
     @staticmethod
     def __keypoints_from_array(keypoints_array, openpose_keypoints, width, height):
         persons = []
+        if keypoints_array is None:
+            return persons
         for openpose_object in keypoints_array:
             keypoints = []
             for ix, detected_kpt in enumerate(openpose_object):
@@ -200,10 +202,11 @@ class OpenPoseEngine(Engine):
         self._opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
         bounding_boxes = []
+
         for person_keypoints in zip_longest(datum.poseKeypoints,
-                                 datum.handKeypoints[0],
-                                 datum.handKeypoints[1],
-                                 datum.faceKeypoints,
+                                 datum.handKeypoints[0] if datum.handKeypoints[0] is not None else [],
+                                 datum.handKeypoints[1] if datum.handKeypoints[1] is not None else [],
+                                 datum.faceKeypoints if datum.faceKeypoints is not None else [],
                                  fillvalue=None):
             # filter out None points
             valid_keypoints = np.vstack([keypoints for keypoints in person_keypoints if keypoints is not None])
@@ -264,7 +267,7 @@ class OpenPoseEngine(Engine):
         ]
 
 
-engine = OpenPoseEngine(face=True, hand=True)
+engine = OpenPoseEngine() #  face=True, hand=True)
 
 
 @lru_cache()
