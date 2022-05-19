@@ -13,6 +13,8 @@ services:
     runtime: nvidia
     volumes:
       - ./src:/usr/src
+      - $HOME/.aws/credentials:/root/.aws/credentials:ro
+      - $HOME/.aws/config:/root/.aws/config:ro
     ports:
       - 8000:8000
     environment:

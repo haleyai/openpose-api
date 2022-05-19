@@ -1,4 +1,6 @@
 from pydantic import AnyHttpUrl
+from pathlib import Path
+import re
 import io
 from fastapi import (
     APIRouter,
@@ -6,10 +8,11 @@ from fastapi import (
     UploadFile,
     File,
     Body,
+    HTTPException,
 )
 from starlette.responses import StreamingResponse
 
-from app.cv.fun import infer_url, draw_url, infer_file, draw_file, get_engine
+from app.cv.fun import infer_url, draw_url, infer_file, draw_file, infer_s3, write_text_s3, get_engine
 from app.cv.engine import Engine
 from app.schemas.pose import Scene
 
@@ -141,3 +144,93 @@ def draw_pose_from_file(
     """
     image = draw_file(engine, image_file)
     return StreamingResponse(io.BytesIO(image), media_type="image/jpg")
+
+
+@router.post(
+    "/froms3",
+    tags=["bucket", "key"],
+    summary="Image stored in S3 to Scene data",
+    response_model=Scene,
+    response_description="""
+### Successful Response: 
+A Scene object containing detected objects, such as:
+
+- people: detected people
+- vehicles: detected vehicles (disabled)
+- things: detected 'things' (disabled) 
+""",
+)
+def extract_pose_from_s3(
+    *,
+    bucket: str = Body(
+        ...,
+        embed=True,
+        title="S3 bucket",
+        description="S3 bucket with read permission",
+        example="egoscue-vpete-dev",
+    ),
+    key: str = Body(
+        ...,
+        embed=True,
+        title="S3 path of an image",
+        description="S3 path of an image of a person",
+        example="user/12345/visit/11400108/group/1/mastercapture-front.jpg",
+    ),
+    engine: Engine = Depends(get_engine)
+):
+    """
+    ## Extract Pose From URL
+    Extract pose information, from an image URL,
+
+    :param bucket: S3 bucket
+    :param key: S3 key containing an image file
+    :return: A Scene object representing the detected features in the image.
+    """
+    persons = infer_s3(engine, bucket, key)
+    return Scene(people=persons)
+
+
+@router.post(
+    "/froms3tos3",
+    tags=["bucket", "key"],
+    summary="Image stored in S3 to Scene data",
+    response_model=str,
+    response_description="""
+### Successful Response: 
+Created key containing json encoded human body joints.
+""",
+)
+def extract_pose_from_s3_and_save(
+    *,
+    bucket: str = Body(
+        ...,
+        embed=True,
+        title="S3 bucket",
+        description="S3 bucket with read permission",
+        example="egoscue-vpete-dev",
+    ),
+    key: str = Body(
+        ...,
+        embed=True,
+        title="S3 key",
+        description="S3 key containing an image of a person",
+        example="user/12345/visit/11400108/group/1/mastercapture-front.jpg",
+    ),
+    engine: Engine = Depends(get_engine)
+):
+    """
+    ## Extract Pose From URL
+    Extract pose information, from an image URL,
+
+    :param bucket: S3 bucket
+    :param key: S3 key containing an image file
+    :return: A Scene object representing the detected features in the image.
+    """
+    persons = infer_s3(engine, bucket, key)
+    p = Path(key)
+    match = re.match("(.+)-(.+)", p.stem)
+    if not match or match.group(2) not in ('front', 'back', 'left', 'right'):
+        raise HTTPException(404, "bad image name {}".format(p.name))
+    keypoints_s3_key = p.parent / ('keypoints-' + match.group(2) + '.json')
+    write_text_s3(Scene(people=persons).json(), bucket, str(keypoints_s3_key))
+    return str(keypoints_s3_key)

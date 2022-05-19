@@ -1,6 +1,7 @@
 import cv2
 from functools import lru_cache
 import numpy as np
+import boto3
 from typing import List
 from urllib.request import urlopen
 from app.cv.openpose import get_openpose_engine
@@ -36,6 +37,8 @@ FACE_DRAW_STYLE = {
     'color': WHITE,
     'thickness': 1,
 }
+
+s3 = boto3.resource('s3')
 
 
 def pixel(keypoint: Keypoint, width: int, height: int):
@@ -126,6 +129,24 @@ def draw_file(engine: Engine, file):
     draw_persons(image, persons)
     res, out_image = cv2.imencode(".jpg", image)
     return out_image.tostring()
+
+
+def infer_s3(engine: Engine, bucket, key):
+    print(f"inferring from S3 {bucket}:{key}")
+    file_stream = s3.Bucket(bucket).Object(key).get()['Body']
+    image = cv2.imdecode(np.asarray(bytearray(file_stream.read()), dtype="uint8"),
+                         cv2.IMREAD_COLOR)
+    image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    # im = Image.open(file_stream)
+    # return np.array(im)
+    return engine.infer_image(image)
+
+
+def write_text_s3(text, bucket, key):
+    print(f"writing to S3 {bucket}:{key}")
+    print(text)
+    s3_object = s3.Bucket(bucket).Object(key)
+    s3_object.put(Body=text)
 
 
 @lru_cache()
