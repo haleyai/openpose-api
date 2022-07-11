@@ -7,6 +7,7 @@ from urllib.request import urlopen
 from app.cv.openpose import get_openpose_engine
 from app.schemas.pose import Keypoint, Person
 from app.cv.engine import Engine
+from fastapi import HTTPException
 
 
 BLACK = (0, 0, 0)
@@ -60,9 +61,13 @@ def url_to_image(url):
 
 def file_to_image(file):
     contents = file.file.read()
+    if len(contents) == 0:
+        raise HTTPException(status_code=415, detail='can\'t decode the image payload, size == 0')
     print(f">> Contents: [{contents[1:5]}...] of length {len(contents)}")
     image = np.fromstring(contents, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    if image is None:
+        raise HTTPException(status_code=415, detail='can\'t decode the image payload')
     return image
 
 
