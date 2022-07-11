@@ -5,6 +5,8 @@ from app.cv.engine import Engine
 from itertools import zip_longest
 import numpy as np
 import pyopenpose as op
+from fastapi import HTTPException
+
 
 openpose_keypoints = [
     KPId.nose,
@@ -190,10 +192,8 @@ class OpenPoseEngine(Engine):
         return persons
 
     def infer_image(self, image) -> List[Person]:
-        print("inferring from image")
         if image is None:
-            print("no image :(")
-            return []
+            raise HTTPException(status_code=400, detail="image payload missing")
 
         height, width, _ = np.shape(image)
 
@@ -201,8 +201,11 @@ class OpenPoseEngine(Engine):
         datum.cvInputData = image
         self._opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
-        bounding_boxes = []
+        if datum.poseKeypoints is None or len(datum.poseKeypoints) == 0:
+            print('no person detected')
+            return []
 
+        bounding_boxes = []
         for person_keypoints in zip_longest(datum.poseKeypoints,
                                  datum.handKeypoints[0] if datum.handKeypoints[0] is not None else [],
                                  datum.handKeypoints[1] if datum.handKeypoints[1] is not None else [],
