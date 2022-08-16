@@ -2,6 +2,7 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from uvicorn import run
 
 from app.config import get_settings
@@ -34,6 +35,14 @@ Others may come at a later stage.
     )
     fast_api.include_router(status.router, prefix="/status", tags=["util"])
     fast_api.include_router(pose.router, prefix="/pose", tags=["pose"])
+
+    fast_api.add_middleware(
+        CORSMiddleware,
+        allow_origins=['*'],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return fast_api
 
 
