@@ -292,14 +292,16 @@ Build or download openpose container [haleyai/openpose](https://github.com/haley
 development setting (reloads on source file change, ...):
 ```
 cd openpose-api
-docker-compose -f docker-compose-dev.yml up
+docker compose -f docker-compose-dev.yml up
 ```
 
 production setting:
 ```
 cd openpose-api
-docker-compose up
+docker compose up
 ```
+
+Docker compose command could be also `docker-compose` instead of `docker compose` for older Compose versions.
 
 In a browser visit `http://localhost:8000/docs`. Assuming the browser is running on the same machine.
 If everything worked, you should see an interactive Swagger documentation wehere you can try out the API.  
